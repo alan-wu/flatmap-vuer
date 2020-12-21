@@ -93,7 +93,7 @@ const mapResize = map => {
 export default {
   name: "FlatmapVuer",
   beforeCreate: function() {
-    this.mapManager = undefined;
+    this.mapManagerInternal = undefined;
     this.mapImp = undefined;
   },
   methods: {
@@ -266,7 +266,7 @@ export default {
         let entry = this.entry;
         if (state && state.entry)
           entry = state.entry;
-        let promise1 = this.mapManager.loadMap(entry, this.$refs.display,
+        let promise1 = this.mapManagerInternal.loadMap(entry, this.$refs.display,
           this.eventCallback(),
           {
             //fullscreenControl: false,
@@ -352,6 +352,13 @@ export default {
       type: String,
       default: undefined
     },
+    /**
+     * Specify the endpoint of the flatmap server.
+     */
+    mapManager: {
+      type: Object,
+      default: undefined
+    },
   },
   data: function() {
     return {
@@ -386,10 +393,14 @@ export default {
   },
   mounted: function() {
     const flatmap = require("@dbrnz/flatmap-viewer");
-    let endpoint = this.flatmapAPI;
-    if (!endpoint)
-      endpoint = "https://mapcore-demo.org/flatmaps/";
-    this.mapManager = new flatmap.MapManager(endpoint);
+    if (!this.mapManager) {
+      let endpoint = this.flatmapAPI;
+      if (!endpoint)
+        endpoint = "https://mapcore-demo.org/flatmaps/";
+      this.mapManagerInternal = new flatmap.MapManager(endpoint);
+    } else {
+      this.mapManagerInternal = this.mapManager;
+    }
     if (this.renderAtMounted)
       this.createFlatmap();
   }

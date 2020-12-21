@@ -43,6 +43,7 @@
       :displayMinimap="displayMinimap"
       style="height:100%"
       :flatmapAPI="flatmapAPI"
+      :mapManager="mapManager"
     />
   </div>
 </template>
@@ -212,7 +213,8 @@ export default {
   data: function() {
     return {
       activeSpecies: undefined,
-      appendToBody: false
+      appendToBody: false,
+      mapManager: undefined,
     };
   },
   watch: {
@@ -223,7 +225,14 @@ export default {
       immediate: true,
       deep: true,
     }
-  }
+  },
+  created: function() {
+    const flatmap = require("@dbrnz/flatmap-viewer");
+    let endpoint = this.flatmapAPI;
+    if (!endpoint)
+      endpoint = "https://mapcore-demo.org/flatmaps/";
+    this.mapManager = new flatmap.MapManager(endpoint);
+  },
 };
 </script>
 
