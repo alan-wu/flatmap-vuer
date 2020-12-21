@@ -14,7 +14,7 @@
           @change="flatmapChanged"
           v-popover:selectPopover
         >
-          <el-option v-for="(item, key) in availableSpecies" :key="key" :label="key" :value="key">
+          <el-option v-for="(item, key) in speciesList" :key="key" :label="key" :value="key">
             <el-row>
               <el-col :span="8"><i :class="item.iconClass"></i></el-col>
               <el-col :span="12">{{ key }}</el-col>
@@ -24,7 +24,7 @@
       
     </div>
     <FlatmapVuer
-      v-for="(item, key) in availableSpecies"
+      v-for="(item, key) in speciesList"
       :key="key"
       :showLayer="showLayer"
       v-show="activeSpecies==key"
@@ -68,16 +68,6 @@ export default {
   name: "MultiFlatmapVuer",
   components: {
     FlatmapVuer
-  },
-  mounted: function() {
-    if (!this.state) {
-      if (this.initial && this.availableSpecies[this.initial] !== undefined) {
-        this.activeSpecies = this.initial;
-      } else {
-        this.activeSpecies = Object.keys(this.availableSpecies)[0];
-      }
-      this.$refs[this.activeSpecies][0].createFlatmap();
-    }
   },
   methods: {
     FlatmapSelected: function(resource) {
@@ -215,6 +205,7 @@ export default {
       activeSpecies: undefined,
       appendToBody: false,
       mapManager: undefined,
+      speciesList: {},
     };
   },
   watch: {
@@ -232,6 +223,28 @@ export default {
     if (!endpoint)
       endpoint = "https://mapcore-demo.org/flatmaps/";
     this.mapManager = new flatmap.MapManager(endpoint);
+    this.mapManager.allMaps().then(mapsArray => {
+      for (const map in mapsArray) {
+        if (this.availableSpecies) {
+          for (const name in this.availableSpecies) {
+            if (this.availableSpecies[name].taxo === mapsArray[map].describes) {
+              this.speciesList[name] = this.availableSpecies[name];
+            }
+          }
+        }
+      }
+      if (!this.state) {
+        if (this.initial && this.speciesList[this.initial] !== undefined) {
+          this.activeSpecies = this.initial;
+        } else {
+          this.activeSpecies = Object.keys(this.speciesList)[0];
+        }
+        this.$nextTick(() => {
+          this.$refs[this.activeSpecies][0].createFlatmap();
+        })
+        
+      }
+    });
   },
 };
 </script>
