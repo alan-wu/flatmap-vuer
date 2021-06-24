@@ -144,7 +144,7 @@ export default {
   methods: {
     backgroundChangeCallback: function(colour) {
       this.currentBackground = colour;
-      this.mapImp.setBackgroundColour(this.currentBackground, 1 );
+      this.mapImp.setBackgroundColour(this.currentBackground);
     },
     toggleDrawer: function () {
       this.drawerOpen = !this.drawerOpen;
@@ -399,8 +399,6 @@ export default {
         promise1.then(returnedObject => {
           this.mapImp = returnedObject;
           this.sensor = new ResizeSensor(this.$refs.display, mapResize(this.mapImp));
-          this.mapImp.setBackgroundOpacity(1);
-          this.backgroundChangeCallback(this.currentBackground);
           this.pathways = this.mapImp.pathTypes();
           this.$emit("ready", this);
           this.loading = false;
@@ -699,6 +697,11 @@ export default {
 
 .tooltip {
   display: none;
+}
+
+
+>>>.mapboxgl-map.mapboxgl-ctrl-minimap {
+    background-color: white;
 }
 
 >>>.flatmap-tooltip-popup .mapboxgl-popup-content {
